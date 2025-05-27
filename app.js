@@ -105,6 +105,7 @@ SerialPort.list()
             stopBits: 1,
             parity: "none",
             autoOpen: true,
+            endOnClose: true,
           });
 
           port.on("open", () => {
@@ -113,6 +114,14 @@ SerialPort.list()
                 `✅ Port opened on ${selectedPortPath}. Baud rate: ${baudRate}. \nPress Ctrl+C to exit.`
               )
             );
+          });
+
+          port.on("error", (err) => {
+            console.log(chalk.red("❌ Port error:"), err);
+          });
+
+          port.on("close", () => {
+            console.log(chalk.red("❌ Port closed."));
           });
 
           /**
