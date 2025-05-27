@@ -11,6 +11,51 @@ const rl = readline.createInterface({
 });
 
 /**
+ * Common baud rates
+ */
+const COMMON_BAUD_RATES = [9600, 19200, 38400, 57600, 115200];
+
+async function askBaudRate() {
+  console.log(chalk.cyanBright("\n⚙️  Choose a Baud Rate:"));
+  COMMON_BAUD_RATES.forEach((rate, i) => {
+    console.log(`${chalk.green(i + 1)}: ${rate}`);
+  });
+  console.log(`${chalk.green("c")}: Custom baud rate`);
+
+  return new Promise((resolve) => {
+    rl.question(
+      chalk.blue("\nEnter option number or 'c' for custom: "),
+      (input) => {
+        if (input.toLowerCase() === "c") {
+          rl.question(
+            chalk.blue("Enter custom baud rate (number): "),
+            (customRate) => {
+              const parsed = parseInt(customRate);
+              if (isNaN(parsed) || parsed <= 0) {
+                console.log(
+                  chalk.red("❌ Invalid baud rate. Using default 9600.")
+                );
+                resolve(9600);
+              } else {
+                resolve(parsed);
+              }
+            }
+          );
+        } else {
+          const index = parseInt(input) - 1;
+          if (index >= 0 && index < COMMON_BAUD_RATES.length) {
+            resolve(COMMON_BAUD_RATES[index]);
+          } else {
+            console.log(chalk.red("❌ Invalid selection. Using default 9600."));
+            resolve(9600);
+          }
+        }
+      }
+    );
+  });
+}
+
+/**
  * List available ports
  */
 SerialPort.list()
@@ -45,15 +90,17 @@ SerialPort.list()
 
       rl.question(
         chalk.blue("Choose data reading mode (raw / text / byte): "),
-        (mode) => {
+        async (mode) => {
           mode = mode.trim().toLowerCase();
 
           /**
            * Create serial port instance and open it
            */
+          const baudRate = await askBaudRate();
+
           const port = new SerialPort({
             path: selectedPortPath,
-            baudRate: 9600,
+            baudRate,
             dataBits: 8,
             stopBits: 1,
             parity: "none",
@@ -63,7 +110,7 @@ SerialPort.list()
           port.on("open", () => {
             console.log(
               chalk.greenBright(
-                `✅ Port opened on ${selectedPortPath}. Press Ctrl+C to exit.`
+                `✅ Port opened on ${selectedPortPath}. Baud rate: ${baudRate}. \nPress Ctrl+C to exit.`
               )
             );
           });
