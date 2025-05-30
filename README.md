@@ -1,4 +1,3 @@
-````markdown
 # 🔌 Node Serial Port Reader
 
 A simple terminal utility built with Node.js that:
@@ -25,7 +24,6 @@ A simple terminal utility built with Node.js that:
 git clone https://github.com/CoderLovely08/node-serial-port-reader
 cd node-serial-port-reader
 ```
-````
 
 2. Install dependencies:
 
@@ -112,11 +110,6 @@ const port = new SerialPort({
 
   - Try running with `sudo`, or add your user to the dialout group.
 
----
-
-## 📄 License
-
-MIT License
 
 ---
 
